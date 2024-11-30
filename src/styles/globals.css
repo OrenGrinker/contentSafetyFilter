@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply antialiased bg-gray-50;
+}
+
+.transition-all {
+  @apply duration-200;
+}

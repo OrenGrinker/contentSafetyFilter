@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "AI Content Safety Filter",
+  "name": "contentSafetyFilter",
   "version": "1.0",
-  "description": "Uses Claude AI to check webpage content for age-appropriate material",
+  "description": "Protects users from inappropriate content using AI analysis",
   "permissions": [
     "tabs",
     "scripting",
     "storage",
-    "notifications"  
+    "notifications"
   ],
   "host_permissions": [
     "<all_urls>",
@@ -18,8 +18,5 @@
   },
   "action": {
     "default_popup": "popup.html"
-  },
-  "icons": {
-    "48": "assets/icon48.png"
   }
 }

@@ -1,28 +1,39 @@
-# Content Safety Filter Chrome Extension 🛡️
+# contentSafetyFilter
 
-A Chrome extension that uses Claude AI to protect users under 18 from inappropriate content by analyzing webpage content in real-time.
+An AI-powered Chrome extension that analyzes web content for age-appropriate material using Claude and GPT models.
 
-![Extension Alert Example](https://raw.githubusercontent.com/OrenGrinker/contentSafetyFilter/main/docs/images/alert-example.png)
-*Extension showing an AI-powered content warning for gambling-related content*
+## Features
 
-## 🌟 Features
+### Real-time Content Analysis
+![Content Warning](./docs/images/warning.png)
+- Detects inappropriate content categories (gambling, violence, sexual content, etc.)
+- Provides detailed AI analysis explaining the findings
+- Shows confidence score for detections
+- Real-time alerts for potentially unsafe content
 
-- **Real-time Analysis**: Instantly analyzes webpage content as you browse
-- **AI-Powered**: Uses Claude Anhtropic AI for accurate content detection
-- **Multiple Categories**: Detects various types of inappropriate content:
-  - Sexual content
-  - Violence
-  - Gambling
-  - Hate speech
-  - Drugs
-  - Explicit material
-- **Visual Alerts**: Badge notifications and popup warnings
-- **Privacy-Focused**: No data storage, all analysis happens through secure API
-- **Customizable**: Configure sensitivity levels and categories
+### Safe Content Verification
+![Safe Content](./docs/images/safe.png)
+- Clear indication when content is safe
+- Quick and efficient scanning
+- Non-intrusive notifications
 
-## 🚀 Quick Start
+### History Tracking
+![History View](./docs/images/history.png)
+- Maintains a log of all analyzed pages
+- Timestamps for each analysis
+- Quick access to previous results
+- Clear inappropriate content markers
 
-### Installation
+### Flexible Configuration
+![Settings](./docs/images/settings.png)
+- Support for multiple AI providers:
+  - Anthropic (Claude)
+  - OpenAI (GPT)
+- Configurable API keys
+- Model selection options
+- Secure local storage of settings
+
+## Installation
 
 1. Clone the repository:
 ```bash
@@ -35,16 +46,11 @@ cd contentSafetyFilter
 npm install
 ```
 
-3. Set up your configuration:
-Copy `src/config/index.example.ts` to `src/config/index.ts` and add your Anthropic API key:
-```typescript
-export const CONFIG = {
-  ANTHROPIC_API_KEY: 'your-api-key-here', // Get from anthropic.com
-  MAX_CHUNK_SIZE: 100000,
-  MIN_SCANNING_INTERVAL: 5000,
-  MODEL: 'claude-3-sonnet-20240229'
-};
-```
+3. Configure your API keys:
+- Open Settings tab in the extension
+- Choose your preferred AI provider
+- Enter your API key
+- Select desired model
 
 4. Build the extension:
 ```bash
@@ -57,17 +63,15 @@ npm run build
 - Click "Load unpacked"
 - Select the `dist` directory
 
-## 🛠️ Development
+## Development
 
 ### Prerequisites
-
 - Node.js >= 18
 - npm >= 8
 - Chrome browser
-- Anthropic API key ([Get one here](https://www.anthropic.com))
+- API key from Anthropic or OpenAI
 
 ### Available Commands
-
 ```bash
 # Install dependencies
 npm install
@@ -78,87 +82,49 @@ npm run build
 # Build and watch for changes
 npm run watch
 
-# Check types
+# Type checking
 npm run type-check
-
-# Lint code
-npm run lint
 ```
 
 ### Project Structure
-
 ```
-contentSafetyFilter/
-├── src/
-│   ├── assets/           # Icons and images
-│   ├── config/          # Configuration files
-│   ├── services/        # Core services
-│   │   ├── claude.ts   # Claude AI service
-│   ├── types/          # TypeScript types
-│   ├── utils/          # Utility functions
-│   ├── background.ts   # Extension background script
-│   └── popup.ts        # Extension popup script
-├── dist/               # Built extension
-└── package.json
+src/
+├── components/    # UI components
+├── services/     # AI service integrations
+├── types/        # TypeScript definitions
+├── popup/        # Extension popup UI
+└── styles/       # Global styles
 ```
 
-## 💡 Usage
+## Features
+- Real-time content analysis
+- Multiple AI provider support
+- Detailed content categorization
+- History tracking
+- Secure API key management
+- Safe/unsafe content indicators
+- Confidence scoring
 
-1. After installation, the extension will automatically start analyzing web pages
-2. Look for the extension icon in your Chrome toolbar:
-   - 🟢 Green: Page is safe
-   - 🔴 Red: Inappropriate content detected
-3. Click the icon to see detailed analysis
-4. Notifications will appear when inappropriate content is detected
-
-## ⚙️ Configuration
-
-Customize the extension behavior in `src/config/index.ts`:
-
-```typescript
-export const CONFIG = {
-  MAX_CHUNK_SIZE: 100000,        // Maximum text length to analyze
-  MIN_SCANNING_INTERVAL: 5000,   // Minimum time between scans (ms)
-  DEBUG: false                   // Enable debug logging
-};
-```
-
-## 🔒 Privacy & Security
-
-- No user data is stored locally or remotely
-- All content analysis happens through secure API calls
-- No tracking or analytics
+## Privacy & Security
+- API keys stored locally
+- No data collection or sharing
+- All analysis performed through secure API calls
 - Open source for transparency
 
-## 🤝 Contributing
+## License
+MIT
 
+## Contributing
 1. Fork the repository
-2. Create your feature branch:
-```bash
-git checkout -b feature/amazing-feature
-```
-
-3. Commit your changes:
-```bash
-git commit -m 'Add amazing feature'
-```
-
-4. Push to the branch:
-```bash
-git push origin feature/amazing-feature
-```
-
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## ⚠️ Disclaimer
-
-This extension is meant as a helpful tool but should not be the only measure for content filtering. Parents and guardians should maintain appropriate oversight of internet usage.
-
-## 🙏 Acknowledgments
-
-- [Anthropic](https://www.anthropic.com/) for the Claude AI API
+## Acknowledgments
+- [Anthropic](https://www.anthropic.com/) for Claude AI API
+- [OpenAI](https://openai.com/) for GPT API
 - [Chrome Extensions](https://developer.chrome.com/docs/extensions/) documentation
+
+---
+Made with ❤️ by [Oren Grinker](https://github.com/OrenGrinker)

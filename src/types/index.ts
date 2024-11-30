@@ -1,20 +1,20 @@
-// src/types/index.ts
-export interface ContentAnalysis {
-    isInappropriate: boolean;
-    categories: string[];
-    explanation: string;
-    confidence: number;
-  }
-  
-  export interface TabData {
-    url: string;
-    analysis: ContentAnalysis;
-    timestamp: number;
-  }
-  
-  export interface ClaudeResponse {
-    content: Array<{
-      text: string;
-    }>;
-  }
-  
+export interface Analysis {
+  isInappropriate: boolean;
+  categories: string[];
+  explanation: string;
+  confidence: number;
+  timestamp?: number;
+  url?: string;
+}
+
+export interface Settings {
+  apiKey: string;
+  model: string;
+  provider: 'anthropic' | 'openai';
+}
+
+export interface TabData {
+  analysis: Analysis;
+  url: string;
+  timestamp: number;
+}

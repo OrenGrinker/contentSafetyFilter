@@ -1,7 +1,5 @@
-// src/background.ts
 import { ClaudeService } from './services/claude';
-import { extractPageText } from './utils/dom';
-import { ContentAnalysis, TabData } from './types/analysis';
+import { ContentAnalysis } from './types/analysis';
 import { CONFIG } from './config';
 
 class BackgroundService {
@@ -11,26 +9,17 @@ class BackgroundService {
   constructor() {
     this.claudeService = ClaudeService.getInstance();
     this.initializeListeners();
-    this.requestNotificationPermission();
-  }
-
-  private async requestNotificationPermission(): Promise<void> {
-    try {
-      // Request notification permission when extension loads
-      const permission = await chrome.permissions.contains({
-        permissions: ['notifications']
-      });
-      
-      if (!permission) {
-        console.log('Notifications permission not granted');
-      }
-    } catch (error) {
-      console.error('Error requesting notification permission:', error);
-    }
+    console.log('BackgroundService initialized');
   }
 
   private initializeListeners(): void {
     chrome.tabs.onUpdated.addListener(this.handleTabUpdate.bind(this));
+    console.log('Listeners initialized');
+  }
+
+  // Add public method for test analysis
+  public async testAnalysis(text: string): Promise<ContentAnalysis | null> {
+    return await this.claudeService.analyzeContent(text);
   }
 
   private async handleTabUpdate(
@@ -40,13 +29,13 @@ class BackgroundService {
   ): Promise<void> {
     if (!tab.url || 
         tab.url.startsWith('chrome://') || 
-        tab.url.startsWith('chrome-extension://') ||
-        tab.url.startsWith('chrome-search://') ||
-        tab.url.startsWith('chrome-devtools://')) {
+        tab.url.startsWith('chrome-extension://')) {
       return;
     }
 
-    if (changeInfo.status !== 'complete') return;
+    if (changeInfo.status !== 'complete') {
+      return;
+    }
 
     const currentTime = Date.now();
     if (currentTime - this.lastAnalysisTime < CONFIG.MIN_SCANNING_INTERVAL) {
@@ -57,73 +46,74 @@ class BackgroundService {
     try {
       const [result] = await chrome.scripting.executeScript({
         target: { tabId },
-        func: extractPageText
+        func: () => {
+          return Array.from(document.querySelectorAll('body, body *'))
+            .filter(element => {
+              const style = window.getComputedStyle(element);
+              return style.display !== 'none' && 
+                     style.visibility !== 'hidden' && 
+                     style.opacity !== '0';
+            })
+            .map(element => element.textContent)
+            .join(' ');
+        }
       });
 
       if (!result?.result) {
-        console.log('No text content found');
         return;
       }
 
       const pageText = result.result;
       const analysis = await this.claudeService.analyzeContent(pageText);
 
-      if (!analysis) {
-        console.log('No analysis results');
-        return;
-      }
-
-      if (analysis.isInappropriate) {
-        await this.handleInappropriateContent(tabId, tab.url, analysis);
-      }
-    } catch (error) {
-      console.error('Extension error:', error);
-    }
-  }
-
-  private async handleInappropriateContent(
-    tabId: number,
-    url: string,
-    analysis: ContentAnalysis
-  ): Promise<void> {
-    try {
-      // Store the analysis results
-      const tabData: TabData = {
-        url,
+      // Store the analysis result
+      const tabData = {
+        url: tab.url,
         analysis,
         timestamp: Date.now()
       };
 
       await chrome.storage.local.set({ [`tab${tabId}`]: tabData });
 
-      // Update badge
-      await chrome.action.setBadgeText({
-        text: '!',
-        tabId
-      });
+      if (analysis?.isInappropriate) {
+        await chrome.action.setBadgeText({
+          text: '!',
+          tabId
+        });
 
-      await chrome.action.setBadgeBackgroundColor({
-        color: '#FF0000',
-        tabId
-      });
+        await chrome.action.setBadgeBackgroundColor({
+          color: '#FF0000',
+          tabId
+        });
 
-      // Show notification
-      try {
         await chrome.notifications.create({
           type: 'basic',
-          iconUrl: chrome.runtime.getURL('assets/icon48.png'),
+          iconUrl: '/assets/icon48.png',
           title: 'Content Warning',
           message: `Inappropriate content detected: ${analysis.categories.join(', ')}`,
           priority: 2
         });
-      } catch (notificationError) {
-        console.error('Failed to create notification:', notificationError);
+      } else {
+        await chrome.action.setBadgeText({
+          text: '',
+          tabId
+        });
       }
     } catch (error) {
-      console.error('Error handling inappropriate content:', error);
+      console.error('Extension error:', error);
     }
   }
 }
 
-// Initialize the background service
-const backgroundService = new BackgroundService();
+// Initialize service worker
+const service = new BackgroundService();
+
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'TEST_ANALYSIS') {
+    service.testAnalysis(message.text)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true; // Will respond asynchronously
+  }
+});

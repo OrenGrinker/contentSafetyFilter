@@ -2,38 +2,37 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
+  devtool: 'source-map',
   entry: {
-    background: './src/background.ts',
-    popup: './src/popup.ts'
+    popup: './src/popup/index.tsx',
+    background: './src/background.ts'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js'
   },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
+  },
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       }
     ]
-  },
-  resolve: {
-    extensions: ['.ts', '.js']
   },
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: 'src/manifest.json' },
-        { from: 'src/popup.html' },
-        { from: 'src/styles/popup.css', to: 'styles/popup.css' },
-        { 
-          from: 'src/assets/icon48.png', 
-          to: 'assets/icon48.png',
-          noErrorOnMissing: true 
-        }
+        { from: 'src/popup/popup.html', to: 'popup.html' },
+        { from: 'src/styles', to: 'styles', noErrorOnMissing: true }
       ]
     })
   ]
